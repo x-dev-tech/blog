@@ -3,18 +3,25 @@ name: Auto Tag when a PR to main
 on:
   push:
     branches:
-      - main  # 监听 main 分支的推送事件
+      - main  # 或 main，根据实际情况修改
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   tag:
     runs-on: ubuntu-latest
-    # 关键条件：仅当 PR 合并时触发（排除直接 push）
-    if: github.event.pull_request.merged == true
+    # 仅当 PR 合并或手动触发时执行
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.pull_request.merged == true)
     steps:
+      - name: Debug context
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Is PR merged: ${{ github.event.pull_request.merged }}"
+        shell: bash
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整的提交历史
+          fetch-depth: 0
 
       - name: Generate tag name
         id: tagger
@@ -35,4 +42,3 @@ jobs:
               ref: `refs/tags/${process.env.tag_name}`,
               sha: context.sha
             })
-    
