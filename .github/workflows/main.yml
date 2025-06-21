@@ -1,0 +1,38 @@
+name: Auto Tag when a PR to Master
+
+on:
+  push:
+    branches:
+      - master  # 监听 master 分支的推送事件
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    # 关键条件：仅当 PR 合并时触发（排除直接 push）
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整的提交历史
+
+      - name: Generate tag name
+        id: tagger
+        run: |
+          DATE=$(date +'%Y.%m.%d')
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          TAG="v${DATE}-${COMMIT_COUNT}"
+          echo "tag_name=${TAG}" >> $GITHUB_ENV
+          echo "Tag to create: ${TAG}"
+
+      - name: Create tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${process.env.tag_name}`,
+              sha: context.sha
+            })
+    
