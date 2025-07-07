@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>常用加解密算法 - AES/CBC（一） | Jason Liu&#39;s Blog</title>
+  <meta name="description" content="AES 加解密的核心原理AES（Advanced Encryption Standard，高级加密标准），它是一种对称加密算法（加密和解密使用同一密钥），具有以下特点：  分组加密将明文分成128位（16字节）的块，按块进行加密，支持密钥长度为128位、192位、256位（密钥越长安全性越高）。 替代-置换网络通过字节替换、行移位、列混淆、轮密钥加等操作，对数据进行多层非线性变换，确保加密强度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用加解密算法 - AES&#x2F;CBC（一）">
+<meta property="og:url" content="https://blog.xdever.tech/article/aes-1.html">
+<meta property="og:site_name" content="Jason Liu&#39;s Blog">
+<meta property="og:description" content="AES 加解密的核心原理AES（Advanced Encryption Standard，高级加密标准），它是一种对称加密算法（加密和解密使用同一密钥），具有以下特点：  分组加密将明文分成128位（16字节）的块，按块进行加密，支持密钥长度为128位、192位、256位（密钥越长安全性越高）。 替代-置换网络通过字节替换、行移位、列混淆、轮密钥加等操作，对数据进行多层非线性变换，确保加密强度。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-06-25T14:15:29.000Z">
+<meta property="article:modified_time" content="2025-07-07T14:56:57.101Z">
+<meta property="article:author" content="Jason Liu">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="加密">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://blog.xdever.tech/article/aes-1.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jason Liu&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Jason Liu&#39;s Blog</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">I am a software engineer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Guangzhou, China</small>
+      </div>
+      
+<!--       <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div> -->
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <!--
+<div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+ -->
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a><span class="category-list-count">14</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A4%E6%98%93/" rel="tag">交易</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="tag">基本概念</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%AF%E4%BB%98/" rel="tag">支付</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" rel="tag">收单机构</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" rel="tag">收单行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%85%E7%AE%97/" rel="tag">清算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%93%E7%AE%97/" rel="tag">结算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" rel="tag">资金保障</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%87%91%E8%9E%8D/" rel="tag">金融</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E4%BA%A4%E6%98%93/" style="font-size: 13.33px;">交易</a> <a href="/tags/%E5%8A%A0%E5%AF%86/" style="font-size: 13.33px;">加密</a> <a href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" style="font-size: 13.67px;">基本概念</a> <a href="/tags/%E6%94%AF%E4%BB%98/" style="font-size: 14px;">支付</a> <a href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" style="font-size: 13px;">收单机构</a> <a href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" style="font-size: 13px;">收单行</a> <a href="/tags/%E6%B8%85%E7%AE%97/" style="font-size: 13px;">清算</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.33px;">算法</a> <a href="/tags/%E7%BB%93%E7%AE%97/" style="font-size: 13px;">结算</a> <a href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" style="font-size: 13px;">资金保障</a> <a href="/tags/%E9%87%91%E8%9E%8D/" style="font-size: 13px;">金融</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">六月 2025</a><span class="archive-list-count">18</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/aes-1.html" class="title">常用加解密算法 - AES/CBC（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-25T14:15:29.000Z" itemprop="datePublished">2025-06-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/base64.html" class="title">常用加解密算法 - Base64</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-24T14:43:09.000Z" itemprop="datePublished">2025-06-24</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/shu-zi-huo-bi-yu-dian-zi-qian-bao-de-bu-tong.html" class="title">央行的数字货币与微信支付支付宝的电子钱包有什么不同？</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-22T01:12:33.000Z" itemprop="datePublished">2025-06-22</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/rto-he-rpo-you-he-bu-tong.html" class="title">RTO和RPO有何不同？</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-21T03:50:49.000Z" itemprop="datePublished">2025-06-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/zhi-fu-ji-gou-ri-qie.html" class="title">什么是支付机构日切？</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-19T16:09:18.000Z" itemprop="datePublished">2025-06-20</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-AES1" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      常用加解密算法 - AES/CBC（一）
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/article/aes-1.html" class="article-date">
+	  <time datetime="2025-06-25T14:15:29.000Z" itemprop="datePublished">2025-06-25</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a>, <a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+  </span>
+
+
+        
+
+<!--         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/article/aes-1.html#comments" class="article-comment-link">评论</a></span> -->
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.8k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 7(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="AES-加解密的核心原理"><a href="#AES-加解密的核心原理" class="headerlink" title="AES 加解密的核心原理"></a>AES 加解密的核心原理</h2><p>AES（Advanced Encryption Standard，高级加密标准），它是一种对称加密算法（加密和解密使用同一密钥），具有以下特点：</p>
+<ul>
+<li>分组加密<br>将明文分成128位（16字节）的块，按块进行加密，支持密钥长度为128位、192位、256位（密钥越长安全性越高）。</li>
+<li>替代-置换网络<br>通过字节替换、行移位、列混淆、轮密钥加等操作，对数据进行多层非线性变换，确保加密强度。</li>
+<li>高效性<br>硬件和软件实现均高效，适用于各种设备和场景。</li>
+</ul>
+<h2 id="主要应用场景与实例"><a href="#主要应用场景与实例" class="headerlink" title="主要应用场景与实例"></a>主要应用场景与实例</h2><h4 id="数据传输加密（网络通信）"><a href="#数据传输加密（网络通信）" class="headerlink" title="数据传输加密（网络通信）"></a>数据传输加密（网络通信）</h4><ul>
+<li>场景需求<br>保护网络中传输的数据不被窃听或篡改。</li>
+<li>典型例子<ul>
+<li>HTTPS协议：网站通过TLS&#x2F;SSL协议实现加密通信，其中AES是默认的对称加密算法（如AES-256-GCM），用于加密浏览器与服务器之间的网页内容、用于账户密码等数据。</li>
+<li>VPN（虚拟专用网络）：如OpenVPN、IPsec VPN中，AES用于加密远程访问的数据流，确保企业内部网络通信安全（例如：员工通过VPN访问公司服务器时的文件传输）。</li>
+<li>即时通讯软件：微信、WhatsApp的消息加密采用AES算法，对聊天内容、文件传输进行加密，防止中间人攻击。</li>
+</ul>
+</li>
+</ul>
+<h4 id="存储数据加密（硬盘、云端）"><a href="#存储数据加密（硬盘、云端）" class="headerlink" title="存储数据加密（硬盘、云端）"></a>存储数据加密（硬盘、云端）</h4><ul>
+<li>场景需求：保护存储在设备或云端的数据，即使存储介质丢失或被入侵，数据也无法被破解。</li>
+<li>典型例子<ul>
+<li>硬盘加密：Windows BitLocker、macOS FileVault对硬盘进行全磁盘加密，核心算法采用AES（AES-256），加密用户的系统文件、个人数据（如文档、照片）。</li>
+<li>云存储服务：Dropbox、Good Drive在存储用户文件时，使用AES对文件进行加密（用户上传后先加密再存储，下载时解密），防止云端服务器被攻击导致数据泄露。</li>
+<li>移动设备加密：iPhone的Touch ID&#x2F;Face ID解锁功能背后，AE用于加密手机存储的指纹、面容数据及用户隐私信息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="物联网（IoT）与嵌入式设备"><a href="#物联网（IoT）与嵌入式设备" class="headerlink" title="物联网（IoT）与嵌入式设备"></a>物联网（IoT）与嵌入式设备</h4><ul>
+<li>场景需求：物联网设备（如智能家电、传感器）的数据传输和本地存储需轻量化加密。</li>
+<li>典型例子：<ul>
+<li>智能家居设备：小米智能门锁、华为智能摄像头与云端的通信使用AES加密，确保用户开销密码、监控视频不被截获。</li>
+<li>工业传感器：工厂中的传感器采集数据后，通过AES加密传输至中央控制系统，防止工业数据被恶意篡改（如能源行业的管道压力数据传输）。</li>
+<li>RFID标签加密：部分高安全性RFID标签（如金融IC卡、电子护照）使用AES对用户身份信息加密，防止标签被伪造或信息窃取（身份证芯片内的个人信息保护）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="金融与支付系统"><a href="#金融与支付系统" class="headerlink" title="金融与支付系统"></a>金融与支付系统</h4><ul>
+<li>场景需求：金融交易对安全性要求极高，需确保账户信息、交易数据的机密性。</li>
+<li>典型例子：<ul>
+<li>银行卡交易：银联、Visa的POS机刷卡交易中，AES用于加密银行卡号、CVV码等敏感信息，防止刷卡时数据被侧录器窃取。</li>
+<li>电子钱包：支付宝、微信支付的资金转账数据，通过AES加密传输，同时本地存储的支付密码也以AES加密形式保存。</li>
+<li>区块链加密：部分区块链平台（如以太坊）在智能合约数据存储和传输中使用AES，保护用户账户余额、交易记录等信息。</li>
+</ul>
+</li>
+</ul>
+<h4 id="AES加解密的技术优势与挑战"><a href="#AES加解密的技术优势与挑战" class="headerlink" title="AES加解密的技术优势与挑战"></a>AES加解密的技术优势与挑战</h4><ul>
+<li>优势<ul>
+<li>安全性高：至今未被发现实质性的破解方法，是目前全球应用最广泛的对称加密标准。</li>
+<li>效率均衡：相对非对称加密（如RSA），AES加解密速度快，适合处理大量数据（如视频流、文件传输）。</li>
+</ul>
+</li>
+<li>挑战<ul>
+<li>密钥管理：对称加密的密钥需安全传输和存储（通常结合非对称加密传输密钥，如RSA），否则密钥泄露会导致数据全被破解。</li>
+<li>量子计算威胁：未来量子计算机可能对AES-256等算法构成潜在威胁（但目前尚未有实际破解案例），因此各国也在研发抗量子加密算法（如NIST的后量子密码标准）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="综合应用"><a href="#综合应用" class="headerlink" title="综合应用"></a>综合应用</h4><p>实际场景中，AES常与其他算法配合使用，例如：</p>
+<ul>
+<li>AES+HMAC：加密后用哈希消息消息认证码（如SHA-256）确保数据完整性和身份验证（如HTTPS中的数据传输）。</li>
+<li>AES+RSA：用RSA非对称加密传输AES密钥，再用AES加密量数据（如电子邮件加密工具GPG的工具模式）。</li>
+</ul>
+<h2 id="Java中AES加解密示例"><a href="#Java中AES加解密示例" class="headerlink" title="Java中AES加解密示例"></a>Java中AES加解密示例</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">example.txt</span></span><br><span class="line">This is an AES encrypt/decrypt example file.</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.crypto.*;</span><br><span class="line"><span class="keyword">import</span> javax.crypto.spec.IvParameterSpec;</span><br><span class="line"><span class="keyword">import</span> javax.crypto.spec.SecretKeySpec;</span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.security.InvalidAlgorithmParameterException;</span><br><span class="line"><span class="keyword">import</span> java.security.InvalidKeyException;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"><span class="keyword">import</span> java.security.SecureRandom;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 文件加密工具（AES-256-CBC）</span></span><br><span class="line"><span class="comment"> * 使用 AES-256-CBC 模式加密文件程序，包含文件读取、加密处理和写入操作</span></span><br><span class="line"><span class="comment"> * 这个例子使用 CBC 模式（需要初始化向量 IV）和 PKCS5Padding 填充方式，适合加密大文件。</span></span><br><span class="line"><span class="comment"> * 注意 IV 需要随密文一起存储或传输。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileEncryptor</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">ALGORITHM</span> <span class="operator">=</span> <span class="string">&quot;AES&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">TRANSFORMATION</span> <span class="operator">=</span> <span class="string">&quot;AES/CBC/PKCS5Padding&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 生成随机密钥</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> SecretKey <span class="title function_">generateKey</span><span class="params">(<span class="type">int</span> keySize)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">        <span class="type">KeyGenerator</span> <span class="variable">keyGenerator</span> <span class="operator">=</span> KeyGenerator.getInstance(ALGORITHM);</span><br><span class="line">        keyGenerator.init(keySize);</span><br><span class="line">        <span class="keyword">return</span> keyGenerator.generateKey();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 生成初始化向量</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> IvParameterSpec <span class="title function_">generateIv</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">byte</span>[] iv = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">16</span>];</span><br><span class="line">        <span class="type">SecureRandom</span> <span class="variable">secureRandom</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SecureRandom</span>();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">IvParameterSpec</span>(iv);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加密文件</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">encryptFile</span><span class="params">(SecretKey key, IvParameterSpec iv, File inputFile, File outputFile)</span> <span class="keyword">throws</span> NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IOException &#123;</span><br><span class="line">        <span class="type">Cipher</span> <span class="variable">cipher</span> <span class="operator">=</span> Cipher.getInstance(TRANSFORMATION);</span><br><span class="line">        cipher.init(Cipher.ENCRYPT_MODE, key, iv);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(inputFile);</span><br><span class="line">             <span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(outputFile);</span><br><span class="line">             <span class="type">CipherOutputStream</span> <span class="variable">cos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CipherOutputStream</span>(fos, cipher)) &#123;</span><br><span class="line">            <span class="type">byte</span>[] buffer = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">4096</span>];</span><br><span class="line">            <span class="type">int</span> bytesRead;</span><br><span class="line">            <span class="keyword">while</span> ((bytesRead = fis.read(buffer)) != -<span class="number">1</span>) &#123;</span><br><span class="line">                cos.write(buffer, <span class="number">0</span>, bytesRead);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解密文件</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">decryptFile</span><span class="params">(SecretKey key, IvParameterSpec iv, File inputFile, File outputFile)</span> <span class="keyword">throws</span> IOException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException &#123;</span><br><span class="line">        <span class="type">Cipher</span> <span class="variable">cipher</span> <span class="operator">=</span> Cipher.getInstance(TRANSFORMATION);</span><br><span class="line">        cipher.init(Cipher.DECRYPT_MODE, key, iv);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> (<span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(inputFile);</span><br><span class="line">             <span class="type">CipherInputStream</span> <span class="variable">cis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CipherInputStream</span>(fis, cipher);</span><br><span class="line">             <span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(outputFile)) &#123;</span><br><span class="line">            <span class="type">byte</span>[] buffer = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">4096</span>];</span><br><span class="line">            <span class="type">int</span> bytesRead;</span><br><span class="line">            <span class="keyword">while</span> ((bytesRead = cis.read(buffer)) != -<span class="number">1</span>) &#123;</span><br><span class="line">                fos.write(buffer, <span class="number">0</span>, bytesRead);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 把密钥转换成字符串（用于存储或传输密钥）</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">keyToString</span><span class="params">(SecretKey secretKey)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(secretKey.getEncoded());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 把字符串转换成密钥（用于后续加解密）</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> SecretKey <span class="title function_">stringToKey</span><span class="params">(String keyString)</span> &#123;</span><br><span class="line">        <span class="type">byte</span>[] keyBytes = Base64.getDecoder().decode(keyString);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">SecretKeySpec</span>(keyBytes, ALGORITHM);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 生成密钥</span></span><br><span class="line">            <span class="type">SecretKey</span> <span class="variable">key</span> <span class="operator">=</span> generateKey(<span class="number">256</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 生成IV</span></span><br><span class="line">            <span class="type">IvParameterSpec</span> <span class="variable">iv</span> <span class="operator">=</span> generateIv();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 文件路径</span></span><br><span class="line">            <span class="type">File</span> <span class="variable">originalFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;example.txt&quot;</span>);</span><br><span class="line">            <span class="type">File</span> <span class="variable">encryptedFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;example.encrypted&quot;</span>);</span><br><span class="line">            <span class="type">File</span> <span class="variable">decryptedFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(<span class="string">&quot;example.decrypted&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 加密文件</span></span><br><span class="line">            encryptFile(key, iv, originalFile, encryptedFile);</span><br><span class="line">            System.out.println(<span class="string">&quot;文件加密完成&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 解密文件</span></span><br><span class="line">            decryptFile(key, iv, encryptedFile, decryptedFile);</span><br><span class="line">            System.out.println(<span class="string">&quot;文件解密完成&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 保存密钥</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">keyString</span> <span class="operator">=</span> keyToString(key);</span><br><span class="line">            System.out.println(<span class="string">&quot;密钥=&quot;</span> + keyString);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 加载密钥</span></span><br><span class="line">            <span class="type">SecretKey</span> <span class="variable">loadKey</span> <span class="operator">=</span> stringToKey(keyString);</span><br><span class="line">            System.out.println(<span class="string">&quot;密钥转换成功&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <div class="article-footer">
+      <!-- <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://blog.xdever.tech/article/aes-1.html" title="常用加解密算法 - AES/CBC（一）" target="_blank" rel="external">https://blog.xdever.tech/article/aes-1.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+-->
+<!--
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="" target="_blank"><span class="text-dark">Jason Liu&#39;s Blog</span><small class="ml-1x">I am a software engineer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+ -->
+
+    </div>
+  </article>
+  
+    <!--
+
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+ -->
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/article/base64.html" title="常用加解密算法 - Base64"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  <!-- 
+   --><!-- Button trigger modal --><!--
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+   --><!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> --><!--
+   -->
+  
+  <!-- <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div> -->
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <!--
+<footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer> -->
+
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
