@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>常用加解密算法 - RSA | Jason Liu&#39;s Blog</title>
+  <meta name="description" content="RSA是一种非对称加密算法，在信息安全领域有着广泛的应用。下面将详细介绍其应用场景，并提供Java实现的示例。 一、RSA的主要应用场景 数据加密  常用于对敏感信息（如用户密码、支付信息）进行加密传输。发送方用接收方的公钥加密数据，接收方用自己的私钥解密，确保数据仅能被指定接收者读取。 例如：HTTPS协议中，客户端与服务器握手时，服务器会发送公钥给客户端，客户端用公钥加密对称加密的密钥，再传输">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用加解密算法 - RSA">
+<meta property="og:url" content="https://blog.xdever.tech/article/rsa.html">
+<meta property="og:site_name" content="Jason Liu&#39;s Blog">
+<meta property="og:description" content="RSA是一种非对称加密算法，在信息安全领域有着广泛的应用。下面将详细介绍其应用场景，并提供Java实现的示例。 一、RSA的主要应用场景 数据加密  常用于对敏感信息（如用户密码、支付信息）进行加密传输。发送方用接收方的公钥加密数据，接收方用自己的私钥解密，确保数据仅能被指定接收者读取。 例如：HTTPS协议中，客户端与服务器握手时，服务器会发送公钥给客户端，客户端用公钥加密对称加密的密钥，再传输">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-07-09T16:43:23.000Z">
+<meta property="article:modified_time" content="2025-07-09T16:43:23.855Z">
+<meta property="article:author" content="Jason Liu">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="加密">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://blog.xdever.tech/article/rsa.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jason Liu&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Jason Liu&#39;s Blog</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">I am a software engineer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Guangzhou, China</small>
+      </div>
+      
+<!--       <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div> -->
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <!--
+<div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+ -->
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A5%E5%8F%A3/">接口</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/">支付平台</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A4%E6%98%93/" rel="tag">交易</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="tag">基本概念</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" rel="tag">接口设计</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%AF%E4%BB%98/" rel="tag">支付</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%AF%E4%BB%98%E8%AE%BE%E8%AE%A1/" rel="tag">支付设计</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" rel="tag">收单机构</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" rel="tag">收单行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%85%E7%AE%97/" rel="tag">清算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/" rel="tag">第三方支付平台</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%93%E7%AE%97/" rel="tag">结算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" rel="tag">资金保障</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%87%91%E8%9E%8D/" rel="tag">金融</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E4%BA%A4%E6%98%93/" style="font-size: 13.25px;">交易</a> <a href="/tags/%E5%8A%A0%E5%AF%86/" style="font-size: 13.5px;">加密</a> <a href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" style="font-size: 13.75px;">基本概念</a> <a href="/tags/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" style="font-size: 13px;">接口设计</a> <a href="/tags/%E6%94%AF%E4%BB%98/" style="font-size: 14px;">支付</a> <a href="/tags/%E6%94%AF%E4%BB%98%E8%AE%BE%E8%AE%A1/" style="font-size: 13px;">支付设计</a> <a href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" style="font-size: 13px;">收单机构</a> <a href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" style="font-size: 13px;">收单行</a> <a href="/tags/%E6%B8%85%E7%AE%97/" style="font-size: 13px;">清算</a> <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/" style="font-size: 13px;">第三方支付平台</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.5px;">算法</a> <a href="/tags/%E7%BB%93%E7%AE%97/" style="font-size: 13px;">结算</a> <a href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" style="font-size: 13px;">资金保障</a> <a href="/tags/%E9%87%91%E8%9E%8D/" style="font-size: 13px;">金融</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">六月 2025</a><span class="archive-list-count">18</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/rsa.html" class="title">常用加解密算法 - RSA</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-09T16:43:23.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/zhi-fu-zhuang-tai-ji.html" class="title">支付系统中状态机的实现步骤</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-08T15:46:32.000Z" itemprop="datePublished">2025-07-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%8E%A5%E5%8F%A3/">接口</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/api-idempotency.html" class="title">API幂等性相关实现方式</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-07T16:03:57.000Z" itemprop="datePublished">2025-07-08</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/">支付平台</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/wei-xin-zhi-fu-yu-cai-fu-tong.html" class="title">微信支付与财富通的关系</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-07T15:27:28.000Z" itemprop="datePublished">2025-07-07</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/aes-1.html" class="title">常用加解密算法 - AES/CBC（一）</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-06-25T14:15:29.000Z" itemprop="datePublished">2025-06-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-RSA" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      常用加解密算法 - RSA
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/article/rsa.html" class="article-date">
+	  <time datetime="2025-07-09T16:43:23.000Z" itemprop="datePublished">2025-07-10</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a>, <a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+  </span>
+
+
+        
+
+<!--         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/article/rsa.html#comments" class="article-comment-link">评论</a></span> -->
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.2k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 4(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>RSA是一种非对称加密算法，在信息安全领域有着广泛的应用。下面将详细介绍其应用场景，并提供Java实现的示例。</p>
+<h3 id="一、RSA的主要应用场景"><a href="#一、RSA的主要应用场景" class="headerlink" title="一、RSA的主要应用场景"></a>一、RSA的主要应用场景</h3><ol>
+<li><p><strong>数据加密</strong></p>
+<ul>
+<li>常用于对敏感信息（如用户密码、支付信息）进行加密传输。发送方用接收方的公钥加密数据，接收方用自己的私钥解密，确保数据仅能被指定接收者读取。</li>
+<li>例如：HTTPS协议中，客户端与服务器握手时，服务器会发送公钥给客户端，客户端用公钥加密对称加密的密钥，再传输给服务器，保障密钥交换的安全性。</li>
+</ul>
+</li>
+<li><p><strong>数字签名</strong></p>
+<ul>
+<li>用于验证信息的完整性和发送者的身份。发送方用私钥对信息的哈希值加密（生成签名），接收方用发送方的公钥解密签名并与信息的哈希值比对，若一致则说明信息未被篡改且来自合法发送者。</li>
+<li>例如：软件发布时，开发者会对安装包进行数字签名，用户可通过验证签名确认软件未被恶意篡改。</li>
+</ul>
+</li>
+<li><p><strong>密钥交换</strong></p>
+<ul>
+<li>在对称加密中，用于安全地交换对称密钥。由于对称加密效率高但密钥传输风险大，可先用RSA加密对称密钥，再传输给对方。</li>
+</ul>
+</li>
+<li><p><strong>身份认证</strong></p>
+<ul>
+<li>结合数字证书（如X.509证书），通过验证公钥与证书的绑定关系，确认实体身份。例如：网银U盾、SSH登录中的密钥认证。</li>
+</ul>
+</li>
+</ol>
+<h3 id="二、Java实现RSA的示例"><a href="#二、Java实现RSA的示例" class="headerlink" title="二、Java实现RSA的示例"></a>二、Java实现RSA的示例</h3><p>Java中可通过<code>java.security</code>包下的<code>KeyPairGenerator</code>、<code>Cipher</code>等类实现RSA加密和解密。以下是完整示例：</p>
+<h4 id="1-生成RSA密钥对（公钥和私钥）"><a href="#1-生成RSA密钥对（公钥和私钥）" class="headerlink" title="1. 生成RSA密钥对（公钥和私钥）"></a>1. 生成RSA密钥对（公钥和私钥）</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.security.*;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RSAKeyGenerator</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">        <span class="comment">// 初始化RSA密钥生成器，指定密钥长度（常用2048位）</span></span><br><span class="line">        <span class="type">KeyPairGenerator</span> <span class="variable">keyPairGenerator</span> <span class="operator">=</span> KeyPairGenerator.getInstance(<span class="string">&quot;RSA&quot;</span>);</span><br><span class="line">        keyPairGenerator.initialize(<span class="number">2048</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 生成密钥对</span></span><br><span class="line">        <span class="type">KeyPair</span> <span class="variable">keyPair</span> <span class="operator">=</span> keyPairGenerator.generateKeyPair();</span><br><span class="line">        <span class="type">PublicKey</span> <span class="variable">publicKey</span> <span class="operator">=</span> keyPair.getPublic();</span><br><span class="line">        <span class="type">PrivateKey</span> <span class="variable">privateKey</span> <span class="operator">=</span> keyPair.getPrivate();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 转换为Base64编码的字符串，便于存储和传输</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">publicKeyStr</span> <span class="operator">=</span> Base64.getEncoder().encodeToString(publicKey.getEncoded());</span><br><span class="line">        <span class="type">String</span> <span class="variable">privateKeyStr</span> <span class="operator">=</span> Base64.getEncoder().encodeToString(privateKey.getEncoded());</span><br><span class="line">        </span><br><span class="line">        System.out.println(<span class="string">&quot;公钥：&quot;</span> + publicKeyStr);</span><br><span class="line">        System.out.println(<span class="string">&quot;私钥：&quot;</span> + privateKeyStr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-RSA加密与解密工具类"><a href="#2-RSA加密与解密工具类" class="headerlink" title="2. RSA加密与解密工具类"></a>2. RSA加密与解密工具类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.crypto.Cipher;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.StandardCharsets;</span><br><span class="line"><span class="keyword">import</span> java.security.*;</span><br><span class="line"><span class="keyword">import</span> java.security.spec.PKCS8EncodedKeySpec;</span><br><span class="line"><span class="keyword">import</span> java.security.spec.X509EncodedKeySpec;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RSAUtil</span> &#123;</span><br><span class="line">    <span class="comment">// 加密算法名称</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">ALGORITHM</span> <span class="operator">=</span> <span class="string">&quot;RSA&quot;</span>;</span><br><span class="line">    <span class="comment">// 加密模式和填充方式（需两端保持一致）</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">TRANSFORMATION</span> <span class="operator">=</span> <span class="string">&quot;RSA/ECB/PKCS1Padding&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用公钥加密</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> data 待加密数据</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> publicKeyStr Base64编码的公钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 加密后的Base64字符串</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">encrypt</span><span class="params">(String data, String publicKeyStr)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 解码公钥</span></span><br><span class="line">        <span class="type">byte</span>[] publicKeyBytes = Base64.getDecoder().decode(publicKeyStr);</span><br><span class="line">        <span class="type">X509EncodedKeySpec</span> <span class="variable">keySpec</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">X509EncodedKeySpec</span>(publicKeyBytes);</span><br><span class="line">        <span class="type">KeyFactory</span> <span class="variable">keyFactory</span> <span class="operator">=</span> KeyFactory.getInstance(ALGORITHM);</span><br><span class="line">        <span class="type">PublicKey</span> <span class="variable">publicKey</span> <span class="operator">=</span> keyFactory.generatePublic(keySpec);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 加密</span></span><br><span class="line">        <span class="type">Cipher</span> <span class="variable">cipher</span> <span class="operator">=</span> Cipher.getInstance(TRANSFORMATION);</span><br><span class="line">        cipher.init(Cipher.ENCRYPT_MODE, publicKey);</span><br><span class="line">        <span class="type">byte</span>[] encryptedData = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));</span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(encryptedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用私钥解密</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> encryptedData 加密后的Base64字符串</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> privateKeyStr Base64编码的私钥</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 解密后的原始数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">decrypt</span><span class="params">(String encryptedData, String privateKeyStr)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 解码私钥</span></span><br><span class="line">        <span class="type">byte</span>[] privateKeyBytes = Base64.getDecoder().decode(privateKeyStr);</span><br><span class="line">        <span class="type">PKCS8EncodedKeySpec</span> <span class="variable">keySpec</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PKCS8EncodedKeySpec</span>(privateKeyBytes);</span><br><span class="line">        <span class="type">KeyFactory</span> <span class="variable">keyFactory</span> <span class="operator">=</span> KeyFactory.getInstance(ALGORITHM);</span><br><span class="line">        <span class="type">PrivateKey</span> <span class="variable">privateKey</span> <span class="operator">=</span> keyFactory.generatePrivate(keySpec);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 解密</span></span><br><span class="line">        <span class="type">Cipher</span> <span class="variable">cipher</span> <span class="operator">=</span> Cipher.getInstance(TRANSFORMATION);</span><br><span class="line">        cipher.init(Cipher.DECRYPT_MODE, privateKey);</span><br><span class="line">        <span class="type">byte</span>[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(encryptedData));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(decryptedData, StandardCharsets.UTF_8);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 示例：使用前面生成的公钥和私钥（实际中需分别传递给发送方和接收方）</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">publicKey</span> <span class="operator">=</span> <span class="string">&quot;此处替换为生成的公钥字符串&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">privateKey</span> <span class="operator">=</span> <span class="string">&quot;此处替换为生成的私钥字符串&quot;</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="type">String</span> <span class="variable">originalData</span> <span class="operator">=</span> <span class="string">&quot;Hello, RSA!&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;原始数据：&quot;</span> + originalData);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 加密</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">encrypted</span> <span class="operator">=</span> encrypt(originalData, publicKey);</span><br><span class="line">        System.out.println(<span class="string">&quot;加密后：&quot;</span> + encrypted);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 解密</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">decrypted</span> <span class="operator">=</span> decrypt(encrypted, privateKey);</span><br><span class="line">        System.out.println(<span class="string">&quot;解密后：&quot;</span> + decrypted);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="三、注意事项"><a href="#三、注意事项" class="headerlink" title="三、注意事项"></a>三、注意事项</h3><ol>
+<li><strong>密钥长度</strong>：推荐使用2048位或以上（1024位已被认为不安全），密钥长度越长，安全性越高，但加密解密速度越慢。</li>
+<li><strong>填充方式</strong>：示例中使用<code>PKCS1Padding</code>，需确保加密和解密端使用相同的填充方式，否则会解密失败。</li>
+<li><strong>性能问题</strong>：RSA加密大文件效率低，实际应用中通常先对大文件用对称加密（如AES），再用RSA加密对称密钥。</li>
+<li><strong>密钥管理</strong>：私钥需严格保密，公钥可公开但需确保其真实性（避免被篡改），通常通过数字证书验证公钥合法性。</li>
+</ol>
+<p>通过以上示例，可实现RSA的基本加密和解密功能，结合实际场景可扩展到数字签名等应用。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <!-- <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://blog.xdever.tech/article/rsa.html" title="常用加解密算法 - RSA" target="_blank" rel="external">https://blog.xdever.tech/article/rsa.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+-->
+<!--
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="" target="_blank"><span class="text-dark">Jason Liu&#39;s Blog</span><small class="ml-1x">I am a software engineer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+ -->
+
+    </div>
+  </article>
+  
+    <!--
+
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+ -->
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/article/zhi-fu-zhuang-tai-ji.html" title="支付系统中状态机的实现步骤"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  <!-- 
+   --><!-- Button trigger modal --><!--
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+   --><!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> --><!--
+   -->
+  
+  <!-- <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div> -->
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <!--
+<footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer> -->
+
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
