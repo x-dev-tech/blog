@@ -17,19 +17,22 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>分类: 支付 | Jason Liu&#39;s Blog</title>
-  <meta name="description" content="我是一名软件工程师，从事互联网工作多年">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Jason Liu&#39;s Blog">
-<meta property="og:url" content="https://blog.xdever.tech/categories/%E6%94%AF%E4%BB%98/page/2/index.html">
+  <title>非对称加密体系（二）-私钥加密/公钥解密 | Jason Liu&#39;s Blog</title>
+  <meta name="description" content="在非对称加密体系中，“私钥加密、公钥解密” 的核心价值是解决 “身份认证”和“数据完整性” 问题（而非机密性），因为公钥公开，任何人都能解密，但其加密者只能是私钥持有者。以下是典型应用场景及原理： 一、核心原理 私钥由持有者唯一掌控，用私钥加密的数据，只有对应的公钥能解密。 由于私钥的唯一性，解密成功可证明： 数据确实来自私钥持有者（身份认证）； 数据在传输过程中未被篡改（完整性）。    二、典">
+<meta property="og:type" content="article">
+<meta property="og:title" content="非对称加密体系（二）-私钥加密&#x2F;公钥解密">
+<meta property="og:url" content="https://blog.xdever.tech/article/encryption-private-public-key.html">
 <meta property="og:site_name" content="Jason Liu&#39;s Blog">
-<meta property="og:description" content="我是一名软件工程师，从事互联网工作多年">
+<meta property="og:description" content="在非对称加密体系中，“私钥加密、公钥解密” 的核心价值是解决 “身份认证”和“数据完整性” 问题（而非机密性），因为公钥公开，任何人都能解密，但其加密者只能是私钥持有者。以下是典型应用场景及原理： 一、核心原理 私钥由持有者唯一掌控，用私钥加密的数据，只有对应的公钥能解密。 由于私钥的唯一性，解密成功可证明： 数据确实来自私钥持有者（身份认证）； 数据在传输过程中未被篡改（完整性）。    二、典">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-07-10T15:13:19.000Z">
+<meta property="article:modified_time" content="2025-07-10T15:17:21.698Z">
 <meta property="article:author" content="Jason Liu">
-<meta property="article:tag" content="支付，交易，支付系统，支付平台，电子钱包，第三方支付">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="加密">
 <meta name="twitter:card" content="summary">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://blog.xdever.tech/categories/%E6%94%AF%E4%BB%98/page/2/index.html">
+  <link rel="canonical" href="https://blog.xdever.tech/article/encryption-private-public-key.html">
   
     <link rel="alternate" href="/atom.xml" title="Jason Liu&#39;s Blog" type="application/atom+xml">
   
@@ -290,117 +293,266 @@
 </aside>
 
   
-  <main class="main" role="main">
-  <article class="content article article-categories article-type-list" itemscope="">
-    <header class="article-header">
-      <h1 itemprop="name" class="hidden-xs">分类: 支付</h1>
-      <p class="hidden-xs">共 5 篇文章</p>
-      <nav role="navigation" id="nav-main" class="okayNav">
-        <ul>
-          <li><a href="/categories">All</a></li>
-          
-          <li><a href="/categories/算法/">算法</a></li>
-          
-          <li><a href="/categories/接口/">接口</a></li>
-          
-          <li><a href="/categories/支付/">支付</a></li>
-          
-          <li><a href="/categories/架构/">架构</a></li>
-          
-          <li><a href="/categories/支付平台/">支付平台</a></li>
-          
-        </ul>
-      </nav>
-    </header>
-    <!-- /header -->
-    <div class="article-body">
-      <div class="panel panel-default b-no">
-    <div class="panel-heading" role="tab">
-        <h4 class="panel-title">
-            <a data-toggle="collapse" href="#collapse支付" aria-expanded="true">
-              <i class="icon icon-folder text-active"></i><i class="icon icon-folder-open text"></i>
-              支付
-            </a>
-            <small class="text-muted">(Total 5 articles)</small>
-        </h4>
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-非对称加密体系-私钥加密-公钥解密" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      非对称加密体系（二）-私钥加密/公钥解密
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/article/encryption-private-public-key.html" class="article-date">
+	  <time datetime="2025-07-10T15:13:19.000Z" itemprop="datePublished">2025-07-10</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a>, <a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+  </span>
+
+
+        
+
+<!--         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/article/encryption-private-public-key.html#comments" class="article-comment-link">评论</a></span> -->
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 900(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 3(分)</span>
+	
+
+      </div>
     </div>
-    <div id="collapse支付" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading支付">
-        <div class="panel-body">
-            <div class="collection">
-              
-                
-<a href="/article/zhi-fu-zhuan-ye-shu-yu-shou-dan.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-06-07T10:33:49.000Z" itemprop="datePublished">2025-06-07</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付专业术语-收单（Acquiring）
-</a>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>在非对称加密体系中，<strong>“私钥加密、公钥解密”</strong> 的核心价值是解决 <strong>“身份认证”和“数据完整性”</strong> 问题（而非机密性），因为公钥公开，任何人都能解密，但其加密者只能是私钥持有者。以下是典型应用场景及原理：</p>
+<h3 id="一、核心原理"><a href="#一、核心原理" class="headerlink" title="一、核心原理"></a>一、核心原理</h3><ul>
+<li>私钥由持有者唯一掌控，用私钥加密的数据，只有对应的公钥能解密。</li>
+<li>由于私钥的唯一性，解密成功可证明：<ol>
+<li>数据确实来自私钥持有者（身份认证）；</li>
+<li>数据在传输过程中未被篡改（完整性）。</li>
+</ol>
+</li>
+</ul>
+<h3 id="二、典型应用场景"><a href="#二、典型应用场景" class="headerlink" title="二、典型应用场景"></a>二、典型应用场景</h3><h4 id="1-数字签名（最核心场景）"><a href="#1-数字签名（最核心场景）" class="headerlink" title="1. 数字签名（最核心场景）"></a>1. 数字签名（最核心场景）</h4><ul>
+<li><strong>场景</strong>：合同签署、软件发布、文件校验等需确认“发送方身份”和“内容未篡改”的场景。</li>
+<li><strong>流程</strong>：<ol>
+<li>发送方对原始数据计算哈希值（如SHA-256，固定长度的摘要）；</li>
+<li>用自己的私钥对哈希值加密，生成“数字签名”；</li>
+<li>将原始数据+数字签名一起发送给接收方；</li>
+<li>接收方用发送方的公钥解密签名，得到哈希值A；</li>
+<li>同时对原始数据计算哈希值B，对比A和B：若一致，说明数据未篡改且确实来自私钥持有者。</li>
+</ol>
+</li>
+<li><strong>例子</strong>：<ul>
+<li>软件厂商发布安装包时，会附带用私钥签名的校验文件，用户通过厂商公钥验证签名，确认安装包未被恶意篡改。</li>
+<li>区块链交易中，用户用私钥签名交易，全网节点用其公钥验证签名，确认交易合法性。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-身份认证（如SSL-TLS握手）"><a href="#2-身份认证（如SSL-TLS握手）" class="headerlink" title="2. 身份认证（如SSL&#x2F;TLS握手）"></a>2. 身份认证（如SSL&#x2F;TLS握手）</h4><ul>
+<li><strong>场景</strong>：HTTPS连接建立时，服务器向客户端证明“自己是合法服务器”。</li>
+<li><strong>流程</strong>：<ol>
+<li>服务器在SSL握手阶段，用自己的私钥对“随机数据+会话信息”加密，生成签名；</li>
+<li>客户端用服务器证书中的公钥解密签名，验证数据一致性；</li>
+<li>若验证通过，客户端确认服务器身份（防止中间人冒充）。</li>
+</ol>
+</li>
+</ul>
+<h4 id="3-权限证明（如API访问授权）"><a href="#3-权限证明（如API访问授权）" class="headerlink" title="3. 权限证明（如API访问授权）"></a>3. 权限证明（如API访问授权）</h4><ul>
+<li><strong>场景</strong>：第三方应用访问用户数据时，需证明“已获得用户授权”。</li>
+<li><strong>流程</strong>：<ol>
+<li>用户用私钥对“授权信息（如允许访问XX数据）”加密，生成授权凭证；</li>
+<li>第三方应用将凭证发送给服务端，服务端用用户公钥解密；</li>
+<li>解密成功即证明授权确实来自用户，允许访问。</li>
+</ol>
+</li>
+</ul>
+<h4 id="4-时间戳服务"><a href="#4-时间戳服务" class="headerlink" title="4. 时间戳服务"></a>4. 时间戳服务</h4><ul>
+<li><strong>场景</strong>：证明“某文件在特定时间已存在”（如知识产权确权）。</li>
+<li><strong>流程</strong>：<ol>
+<li>用户将文件哈希值发送给时间戳服务器；</li>
+<li>服务器用私钥对“哈希值+当前时间”加密，生成时间戳证书；</li>
+<li>后续任何人可用服务器公钥解密证书，验证文件在该时间点的存在性和完整性。</li>
+</ol>
+</li>
+</ul>
+<h3 id="三、与“公钥加密、私钥解密”的对比"><a href="#三、与“公钥加密、私钥解密”的对比" class="headerlink" title="三、与“公钥加密、私钥解密”的对比"></a>三、与“公钥加密、私钥解密”的对比</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>加密密钥</th>
+<th>解密密钥</th>
+<th>核心作用</th>
+<th>典型应用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>私钥加密、公钥解密</td>
+<td>私钥</td>
+<td>公钥</td>
+<td>身份认证、数据完整性</td>
+<td>数字签名、SSL握手</td>
+</tr>
+<tr>
+<td>公钥加密、私钥解密</td>
+<td>公钥</td>
+<td>私钥</td>
+<td>数据机密性</td>
+<td>HTTPS密钥交换、加密通信</td>
+</tr>
+</tbody></table>
+<h3 id="四、总结"><a href="#四、总结" class="headerlink" title="四、总结"></a>四、总结</h3><p>“私钥加密、公钥解密”的本质是 <strong>“用私钥做‘身份印章’，用公钥验证印章有效性”</strong>，核心解决“信任问题”。其不保证数据机密性（因为公钥可解密），但能确保“数据来源可信”和“内容未被篡改”，是数字世界信任体系的基础。</p>
 
-
-              
-                
-<a href="/article/qi-ye-rong-zi-fang-shi-bao-li.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-06-07T10:28:43.000Z" itemprop="datePublished">2025-06-07</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 企业融资方式-保理（Factoring）
-</a>
-
-
-              
-                
-<a href="/article/zhi-fu-zhong-chang-yong-de-gai-nian.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-06-05T14:40:40.000Z" itemprop="datePublished">2025-06-05</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付中常用的概念
-</a>
-
-
-              
-                
-<a href="/article/jiao-yi-de-ji-ben-gai-nian.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-06-04T16:05:43.000Z" itemprop="datePublished">2025-06-05</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 交易的基本概念
-</a>
-
-
-              
-                
-<a href="/article/zhi-fu-de-ji-ben-gai-nian.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-06-03T14:40:54.000Z" itemprop="datePublished">2025-06-03</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付的基本概念
-</a>
-
-
-              
-            </div>
-        </div>
+      
     </div>
+    <div class="article-footer">
+      <!-- <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://blog.xdever.tech/article/encryption-private-public-key.html" title="非对称加密体系（二）-私钥加密/公钥解密" target="_blank" rel="external">https://blog.xdever.tech/article/encryption-private-public-key.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+-->
+<!--
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="" target="_blank"><span class="text-dark">Jason Liu&#39;s Blog</span><small class="ml-1x">I am a software engineer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
 </div>
+
+ -->
+
     </div>
   </article>
   
+    <!--
+
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
     
-    <nav class="bar bar-footer clearfix" data-stick-bottom>
-        <div class="bar-inner">
-        <ul class="pager pull-left">
-            
-            <li class="prev">
-                <a href="/categories/%E6%94%AF%E4%BB%98/">
-                    <i class="icon icon-angle-left"></i>
-                    上一页
-                </a>
-            </li>
-            
-            
-            <li class="next disabled">
-                <a href="javascript:;">
-                    下一页
-                    <i class="icon icon-angle-right"></i>                    
-                </a>
-            </li>
-            
-        </ul>
-            <div class="total-article bar-right">Page 2 of 2</div>
+  </section>
+
+ -->
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/article/payment-system-split.html" title="支付系统中微服务的拆分标准"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/article/encryption-public-private-key.html" title="非对称加密体系（一）-公钥加密/私钥解密"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  <!-- 
+   --><!-- Button trigger modal --><!--
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+   --><!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> --><!--
+   -->
+  
+  <!-- <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div> -->
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
         </div>
-    </nav>
-    
- 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 </main>
 
   <!--
@@ -448,6 +600,37 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 
 
 
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
 
 
 
