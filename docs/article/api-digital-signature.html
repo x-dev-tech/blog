@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>支付API的数字签名 | Jason Liu&#39;s Blog</title>
+  <meta name="description" content="数字签名在支付API里是保证数据完整性与交易安全的关键技术。下面为你详细介绍它的实现原理和流程： 1. 数字签名的作用 验证身份：能确认请求确实是由指定的商户发出的。 保证完整性：防止数据在传输途中被恶意篡改。 防止重放攻击：有效避免攻击者重复使用之前的交易请求。  2. 基本实现流程（1）准备密钥商户和支付平台会预先协商好一对密钥，分别是AppID（用于标识商户身份）和API密钥（这是一个字符串">
+<meta property="og:type" content="article">
+<meta property="og:title" content="支付API的数字签名">
+<meta property="og:url" content="https://blog.xdever.tech/article/api-digital-signature.html">
+<meta property="og:site_name" content="Jason Liu&#39;s Blog">
+<meta property="og:description" content="数字签名在支付API里是保证数据完整性与交易安全的关键技术。下面为你详细介绍它的实现原理和流程： 1. 数字签名的作用 验证身份：能确认请求确实是由指定的商户发出的。 保证完整性：防止数据在传输途中被恶意篡改。 防止重放攻击：有效避免攻击者重复使用之前的交易请求。  2. 基本实现流程（1）准备密钥商户和支付平台会预先协商好一对密钥，分别是AppID（用于标识商户身份）和API密钥（这是一个字符串">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-07-10T14:50:22.000Z">
+<meta property="article:modified_time" content="2025-07-10T14:51:53.561Z">
+<meta property="article:author" content="Jason Liu">
+<meta property="article:tag" content="算法">
+<meta property="article:tag" content="加密">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://blog.xdever.tech/article/api-digital-signature.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Jason Liu&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">Jason Liu&#39;s Blog</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">I am a software engineer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Guangzhou, China</small>
+      </div>
+      
+<!--       <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div> -->
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <!--
+<div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+ -->
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%8E%A5%E5%8F%A3/">接口</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%94%AF%E4%BB%98/">支付</a><span class="category-list-count">15</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/">支付平台</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9E%B6%E6%9E%84/">架构</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a><span class="category-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%A4%E6%98%93/" rel="tag">交易</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" rel="tag">基本概念</a><span class="tag-list-count">13</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag">微服务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" rel="tag">接口设计</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%AF%E4%BB%98/" rel="tag">支付</a><span class="tag-list-count">14</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%AF%E4%BB%98%E8%AE%BE%E8%AE%A1/" rel="tag">支付设计</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" rel="tag">收单机构</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" rel="tag">收单行</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%B8%85%E7%AE%97/" rel="tag">清算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/" rel="tag">第三方支付平台</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BB%93%E7%AE%97/" rel="tag">结算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" rel="tag">资金保障</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%87%91%E8%9E%8D/" rel="tag">金融</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/%E4%BA%A4%E6%98%93/" style="font-size: 13.25px;">交易</a> <a href="/tags/%E5%8A%A0%E5%AF%86/" style="font-size: 13.5px;">加密</a> <a href="/tags/%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/" style="font-size: 13.75px;">基本概念</a> <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 13px;">微服务</a> <a href="/tags/%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1/" style="font-size: 13px;">接口设计</a> <a href="/tags/%E6%94%AF%E4%BB%98/" style="font-size: 14px;">支付</a> <a href="/tags/%E6%94%AF%E4%BB%98%E8%AE%BE%E8%AE%A1/" style="font-size: 13px;">支付设计</a> <a href="/tags/%E6%94%B6%E5%8D%95%E6%9C%BA%E6%9E%84/" style="font-size: 13px;">收单机构</a> <a href="/tags/%E6%94%B6%E5%8D%95%E8%A1%8C/" style="font-size: 13px;">收单行</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 13px;">架构</a> <a href="/tags/%E6%B8%85%E7%AE%97/" style="font-size: 13px;">清算</a> <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0/" style="font-size: 13px;">第三方支付平台</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 13.5px;">算法</a> <a href="/tags/%E7%BB%93%E7%AE%97/" style="font-size: 13px;">结算</a> <a href="/tags/%E8%B5%84%E9%87%91%E4%BF%9D%E9%9A%9C/" style="font-size: 13px;">资金保障</a> <a href="/tags/%E9%87%91%E8%9E%8D/" style="font-size: 13px;">金融</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/07/">七月 2025</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2025/06/">六月 2025</a><span class="archive-list-count">18</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%9E%B6%E6%9E%84/">架构</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/payment-system-split.html" class="title">支付系统中微服务的拆分标准</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-10T15:21:49.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/encryption-private-public-key.html" class="title">非对称加密体系（二）-私钥加密/公钥解密</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-10T15:13:19.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/encryption-public-private-key.html" class="title">非对称加密体系（一）-公钥加密/私钥解密</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-10T15:13:09.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/api-digital-signature.html" class="title">支付API的数字签名</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-10T14:50:22.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/article/rsa.html" class="title">常用加解密算法 - RSA</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2025-07-09T16:43:23.000Z" itemprop="datePublished">2025-07-10</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-支付API的数字签名" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      支付API的数字签名
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/article/api-digital-signature.html" class="article-date">
+	  <time datetime="2025-07-10T14:50:22.000Z" itemprop="datePublished">2025-07-10</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/%E7%AE%97%E6%B3%95/">算法</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/%E5%8A%A0%E5%AF%86/" rel="tag">加密</a>, <a class="article-tag-link-link" href="/tags/%E7%AE%97%E6%B3%95/" rel="tag">算法</a>
+  </span>
+
+
+        
+
+<!--         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/article/api-digital-signature.html#comments" class="article-comment-link">评论</a></span> -->
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 2.2k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 10(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>数字签名在支付API里是保证数据完整性与交易安全的关键技术。下面为你详细介绍它的实现原理和流程：</p>
+<h3 id="1-数字签名的作用"><a href="#1-数字签名的作用" class="headerlink" title="1. 数字签名的作用"></a>1. 数字签名的作用</h3><ul>
+<li><strong>验证身份</strong>：能确认请求确实是由指定的商户发出的。</li>
+<li><strong>保证完整性</strong>：防止数据在传输途中被恶意篡改。</li>
+<li><strong>防止重放攻击</strong>：有效避免攻击者重复使用之前的交易请求。</li>
+</ul>
+<h3 id="2-基本实现流程"><a href="#2-基本实现流程" class="headerlink" title="2. 基本实现流程"></a>2. 基本实现流程</h3><h4 id="（1）准备密钥"><a href="#（1）准备密钥" class="headerlink" title="（1）准备密钥"></a>（1）准备密钥</h4><p>商户和支付平台会预先协商好一对密钥，分别是<strong>AppID</strong>（用于标识商户身份）和<strong>API密钥</strong>（这是一个字符串，需要严格保密）。</p>
+<h4 id="（2）生成待签名数据"><a href="#（2）生成待签名数据" class="headerlink" title="（2）生成待签名数据"></a>（2）生成待签名数据</h4><p>把请求参数按照一定规则排序并拼接成字符串。以Python代码为例：</p>
+<h4 id="（3）添加API密钥"><a href="#（3）添加API密钥" class="headerlink" title="（3）添加API密钥"></a>（3）添加API密钥</h4><p>将API密钥追加到待签名数据的末尾，这是为了引入只有双方知道的秘密信息。</p>
+<h4 id="（4）计算签名值"><a href="#（4）计算签名值" class="headerlink" title="（4）计算签名值"></a>（4）计算签名值</h4><p>采用特定的哈希算法（像MD5、SHA-256等）对处理后的字符串进行加密，并将结果转换为大写形式。</p>
+<h4 id="（5）发送请求"><a href="#（5）发送请求" class="headerlink" title="（5）发送请求"></a>（5）发送请求</h4><p>把包含签名的参数通过HTTPS协议发送给支付平台。</p>
+<h4 id="（6）验证签名"><a href="#（6）验证签名" class="headerlink" title="（6）验证签名"></a>（6）验证签名</h4><p>支付平台接收到请求后，会使用相同的规则重新计算签名，然后与请求中的签名进行比对。若两者一致，就说明数据是完整且可信的。</p>
+<h3 id="3-安全增强措施"><a href="#3-安全增强措施" class="headerlink" title="3. 安全增强措施"></a>3. 安全增强措施</h3><ul>
+<li><strong>时间戳验证</strong>：检查<code>timestamp</code>参数，防止重放攻击，一般会设置5分钟的有效期。</li>
+<li><strong>随机数（Nonce）</strong>：每次请求都生成唯一的随机字符串，进一步防止重放攻击。</li>
+<li><strong>HTTPS协议</strong>：确保数据在传输过程中的安全性。</li>
+</ul>
+<h3 id="4-注意事项"><a href="#4-注意事项" class="headerlink" title="4. 注意事项"></a>4. 注意事项</h3><ul>
+<li><strong>密钥安全</strong>：API密钥必须严格保密，避免硬编码在客户端代码中。</li>
+<li><strong>参数编码</strong>：所有参数都要使用UTF-8编码，防止出现中文乱码问题。</li>
+<li><strong>签名类型</strong>：要和支付平台约定好使用的哈希算法，如MD5、SHA-256等。</li>
+<li><strong>空值处理</strong>：空参数（如<code>None</code>、空字符串）不应参与签名计算。</li>
+</ul>
+<h3 id="5-实际应用示例"><a href="#5-实际应用示例" class="headerlink" title="5. 实际应用示例"></a>5. 实际应用示例</h3><p>下面是Java实现支付API数字签名的示例代码，包含签名生成和验证的完整流程：</p>
+<h4 id="5-1-签名工具类"><a href="#5-1-签名工具类" class="headerlink" title="5.1. 签名工具类"></a>5.1. 签名工具类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.security.MessageDigest;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SignUtil</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成随机字符串</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">generateNonceStr</span><span class="params">(<span class="type">int</span> length)</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">chars</span> <span class="operator">=</span> <span class="string">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789&quot;</span>;</span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="type">Random</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Random</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">            sb.append(chars.charAt(random.nextInt(chars.length())));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成待签名的字符串（参数排序后拼接）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">generateSignString</span><span class="params">(Map&lt;String, String&gt; params, List&lt;String&gt; excludeKeys)</span> &#123;</span><br><span class="line">        <span class="comment">// 过滤空值和排除的参数</span></span><br><span class="line">        Map&lt;String, String&gt; filteredParams = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : params.entrySet()) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> entry.getKey();</span><br><span class="line">            <span class="type">String</span> <span class="variable">value</span> <span class="operator">=</span> entry.getValue();</span><br><span class="line">            <span class="keyword">if</span> (value != <span class="literal">null</span> &amp;&amp; !value.isEmpty() &amp;&amp; (excludeKeys == <span class="literal">null</span> || !excludeKeys.contains(key))) &#123;</span><br><span class="line">                filteredParams.put(key, value);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 按字典序排序并拼接</span></span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : filteredParams.entrySet()) &#123;</span><br><span class="line">            sb.append(entry.getKey()).append(<span class="string">&quot;=&quot;</span>).append(entry.getValue()).append(<span class="string">&quot;&amp;&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (sb.length() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            sb.deleteCharAt(sb.length() - <span class="number">1</span>); <span class="comment">// 移除最后一个&amp;</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成签名</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">generateSign</span><span class="params">(String signString, String apiKey, String signType)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">signStringWithKey</span> <span class="operator">=</span> signString + <span class="string">&quot;&amp;key=&quot;</span> + apiKey;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;MD5&quot;</span>.equalsIgnoreCase(signType)) &#123;</span><br><span class="line">            <span class="keyword">return</span> md5(signStringWithKey);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;SHA256&quot;</span>.equalsIgnoreCase(signType)) &#123;</span><br><span class="line">            <span class="keyword">return</span> sha256(signStringWithKey);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;不支持的签名类型: &quot;</span> + signType);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * MD5加密</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">md5</span><span class="params">(String data)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">        <span class="type">MessageDigest</span> <span class="variable">md</span> <span class="operator">=</span> MessageDigest.getInstance(<span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        <span class="type">byte</span>[] digest = md.digest(data.getBytes());</span><br><span class="line">        <span class="keyword">return</span> bytesToHexString(digest).toUpperCase();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * SHA256加密</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">sha256</span><span class="params">(String data)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">        <span class="type">MessageDigest</span> <span class="variable">md</span> <span class="operator">=</span> MessageDigest.getInstance(<span class="string">&quot;SHA-256&quot;</span>);</span><br><span class="line">        <span class="type">byte</span>[] digest = md.digest(data.getBytes());</span><br><span class="line">        <span class="keyword">return</span> bytesToHexString(digest).toUpperCase();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 字节数组转十六进制字符串</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">bytesToHexString</span><span class="params">(<span class="type">byte</span>[] bytes)</span> &#123;</span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">byte</span> b : bytes) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">hex</span> <span class="operator">=</span> String.format(<span class="string">&quot;%02x&quot;</span>, b);</span><br><span class="line">            sb.append(hex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 验证签名</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">verifySign</span><span class="params">(Map&lt;String, String&gt; params, String apiKey, String signType)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 提取请求中的签名</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">requestSign</span> <span class="operator">=</span> params.get(<span class="string">&quot;sign&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (requestSign == <span class="literal">null</span> || requestSign.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 复制参数并移除签名</span></span><br><span class="line">        Map&lt;String, String&gt; paramsWithoutSign = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;(params);</span><br><span class="line">        paramsWithoutSign.remove(<span class="string">&quot;sign&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 生成待签名的字符串</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">signString</span> <span class="operator">=</span> generateSignString(paramsWithoutSign, <span class="literal">null</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 生成签名</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">expectedSign</span> <span class="operator">=</span> generateSign(signString, apiKey, signType);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 比较签名</span></span><br><span class="line">        <span class="keyword">return</span> requestSign.equals(expectedSign);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 验证时间戳有效性（默认5分钟）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">isValidTimestamp</span><span class="params">(String timestampStr, <span class="type">long</span> expiresInSeconds)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 注意：这里需要根据实际时间戳格式解析</span></span><br><span class="line">            <span class="comment">// 示例假设时间戳格式为 &quot;yyyy-MM-dd HH:mm:ss&quot;</span></span><br><span class="line">            java.text.<span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">java</span>.text.SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">            <span class="type">Date</span> <span class="variable">timestamp</span> <span class="operator">=</span> sdf.parse(timestampStr);</span><br><span class="line">            <span class="type">long</span> <span class="variable">currentTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">            <span class="type">long</span> <span class="variable">timestampMillis</span> <span class="operator">=</span> timestamp.getTime();</span><br><span class="line">            <span class="type">long</span> <span class="variable">diff</span> <span class="operator">=</span> (currentTime - timestampMillis) / <span class="number">1000</span>; <span class="comment">// 转换为秒</span></span><br><span class="line">            <span class="keyword">return</span> Math.abs(diff) &lt;= expiresInSeconds;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-商户端生成支付请求"><a href="#5-2-商户端生成支付请求" class="headerlink" title="5.2. 商户端生成支付请求"></a>5.2. 商户端生成支付请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MerchantClient</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">APP_ID</span> <span class="operator">=</span> <span class="string">&quot;your_app_id&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">API_KEY</span> <span class="operator">=</span> <span class="string">&quot;your_api_secret_key&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 创建支付请求</span></span><br><span class="line">            Map&lt;String, String&gt; requestParams = createPaymentRequest();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 打印请求参数</span></span><br><span class="line">            System.out.println(<span class="string">&quot;生成的支付请求参数:&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : requestParams.entrySet()) &#123;</span><br><span class="line">                System.out.println(entry.getKey() + <span class="string">&quot; = &quot;</span> + entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 模拟发送请求到支付平台...</span></span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建支付请求</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Map&lt;String, String&gt; <span class="title function_">createPaymentRequest</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 准备请求参数</span></span><br><span class="line">        Map&lt;String, String&gt; params = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        params.put(<span class="string">&quot;app_id&quot;</span>, APP_ID);</span><br><span class="line">        params.put(<span class="string">&quot;order_no&quot;</span>, <span class="string">&quot;ORD&quot;</span> + System.currentTimeMillis());</span><br><span class="line">        params.put(<span class="string">&quot;amount&quot;</span>, <span class="string">&quot;199.99&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;currency&quot;</span>, <span class="string">&quot;CNY&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;timestamp&quot;</span>, getCurrentTimeString());</span><br><span class="line">        params.put(<span class="string">&quot;nonce_str&quot;</span>, SignUtil.generateNonceStr(<span class="number">32</span>));</span><br><span class="line">        params.put(<span class="string">&quot;product_name&quot;</span>, <span class="string">&quot;测试商品&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;notify_url&quot;</span>, <span class="string">&quot;https://your-server.com/notify&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 生成签名</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">signString</span> <span class="operator">=</span> SignUtil.generateSignString(params, <span class="literal">null</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> SignUtil.generateSign(signString, API_KEY, <span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 添加签名到参数中</span></span><br><span class="line">        params.put(<span class="string">&quot;sign&quot;</span>, sign);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> params;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取当前时间字符串（格式：yyyy-MM-dd HH:mm:ss）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">getCurrentTimeString</span><span class="params">()</span> &#123;</span><br><span class="line">        java.text.<span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">java</span>.text.SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> sdf.format(<span class="keyword">new</span> <span class="title class_">Date</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-3-支付平台验证请求"><a href="#5-3-支付平台验证请求" class="headerlink" title="5.3. 支付平台验证请求"></a>5.3. 支付平台验证请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PaymentPlatform</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">API_KEY</span> <span class="operator">=</span> <span class="string">&quot;your_api_secret_key&quot;</span>; <span class="comment">// 商户注册时分配的密钥</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 模拟接收到商户的支付请求</span></span><br><span class="line">            Map&lt;String, String&gt; requestParams = simulatePaymentRequest();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 处理支付请求</span></span><br><span class="line">            Map&lt;String, Object&gt; result = processPaymentRequest(requestParams);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 打印处理结果</span></span><br><span class="line">            System.out.println(<span class="string">&quot;处理结果:&quot;</span>);</span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;String, Object&gt; entry : result.entrySet()) &#123;</span><br><span class="line">                System.out.println(entry.getKey() + <span class="string">&quot; = &quot;</span> + entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理支付请求</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Map&lt;String, Object&gt; <span class="title function_">processPaymentRequest</span><span class="params">(Map&lt;String, String&gt; params)</span> &#123;</span><br><span class="line">        Map&lt;String, Object&gt; result = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 1. 验证时间戳</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">timestamp</span> <span class="operator">=</span> params.get(<span class="string">&quot;timestamp&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (timestamp == <span class="literal">null</span> || !SignUtil.isValidTimestamp(timestamp, <span class="number">300</span>)) &#123; <span class="comment">// 5分钟有效期</span></span><br><span class="line">            result.put(<span class="string">&quot;code&quot;</span>, <span class="number">4001</span>);</span><br><span class="line">            result.put(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;请求已过期&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 2. 验证签名</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">boolean</span> <span class="variable">isValidSign</span> <span class="operator">=</span> SignUtil.verifySign(params, API_KEY, <span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (!isValidSign) &#123;</span><br><span class="line">                result.put(<span class="string">&quot;code&quot;</span>, <span class="number">4002</span>);</span><br><span class="line">                result.put(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;签名验证失败&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> result;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            result.put(<span class="string">&quot;code&quot;</span>, <span class="number">5000</span>);</span><br><span class="line">            result.put(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;签名验证异常: &quot;</span> + e.getMessage());</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 3. 签名验证通过，处理业务逻辑</span></span><br><span class="line">        result.put(<span class="string">&quot;code&quot;</span>, <span class="number">200</span>);</span><br><span class="line">        result.put(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;处理成功&quot;</span>);</span><br><span class="line">        <span class="comment">// 这里可以添加订单处理、金额校验等业务逻辑</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 模拟接收到的支付请求（实际应用中从HTTP请求获取）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, String&gt; <span class="title function_">simulatePaymentRequest</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 实际应用中，这里应该从HTTP请求中获取参数</span></span><br><span class="line">        <span class="comment">// 这里为了演示，直接创建一个模拟的请求参数</span></span><br><span class="line">        Map&lt;String, String&gt; params = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        params.put(<span class="string">&quot;app_id&quot;</span>, <span class="string">&quot;your_app_id&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;order_no&quot;</span>, <span class="string">&quot;ORD&quot;</span> + System.currentTimeMillis());</span><br><span class="line">        params.put(<span class="string">&quot;amount&quot;</span>, <span class="string">&quot;199.99&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;currency&quot;</span>, <span class="string">&quot;CNY&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;timestamp&quot;</span>, getCurrentTimeString());</span><br><span class="line">        params.put(<span class="string">&quot;nonce_str&quot;</span>, SignUtil.generateNonceStr(<span class="number">32</span>));</span><br><span class="line">        params.put(<span class="string">&quot;product_name&quot;</span>, <span class="string">&quot;测试商品&quot;</span>);</span><br><span class="line">        params.put(<span class="string">&quot;notify_url&quot;</span>, <span class="string">&quot;https://your-server.com/notify&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 生成签名</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">signString</span> <span class="operator">=</span> SignUtil.generateSignString(params, <span class="literal">null</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">sign</span> <span class="operator">=</span> SignUtil.generateSign(signString, API_KEY, <span class="string">&quot;MD5&quot;</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 添加签名到参数中</span></span><br><span class="line">        params.put(<span class="string">&quot;sign&quot;</span>, sign);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> params;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取当前时间字符串（格式：yyyy-MM-dd HH:mm:ss）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">getCurrentTimeString</span><span class="params">()</span> &#123;</span><br><span class="line">        java.text.<span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">java</span>.text.SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> sdf.format(<span class="keyword">new</span> <span class="title class_">Date</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">处理结果:</span><br><span class="line">code = 200</span><br><span class="line">message = 处理成功</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-4-注意事项"><a href="#5-4-注意事项" class="headerlink" title="5.4. 注意事项"></a>5.4. 注意事项</h4><ol>
+<li><strong>密钥安全</strong>：API密钥不应该硬编码在代码中，建议从配置文件或环境变量读取</li>
+<li><strong>时间戳验证</strong>：根据实际需求调整有效期（示例中为5分钟）</li>
+<li><strong>字符编码</strong>：确保所有参数使用UTF-8编码</li>
+<li><strong>异常处理</strong>：实际应用中需要完善异常处理逻辑</li>
+<li><strong>签名类型</strong>：根据支付平台要求选择MD5、SHA256等算法</li>
+</ol>
+<p>以上代码展示了支付API数字签名的基本实现流程，在实际应用中，你需要根据具体的支付平台API文档调整参数和签名规则。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <!-- <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://blog.xdever.tech/article/api-digital-signature.html" title="支付API的数字签名" target="_blank" rel="external">https://blog.xdever.tech/article/api-digital-signature.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+-->
+<!--
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="" target="_blank"><span class="text-dark">Jason Liu&#39;s Blog</span><small class="ml-1x">I am a software engineer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+ -->
+
+    </div>
+  </article>
+  
+    <!--
+
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+ -->
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/article/encryption-public-private-key.html" title="非对称加密体系（一）-公钥加密/私钥解密"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/article/rsa.html" title="常用加解密算法 - RSA"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  <!-- 
+   --><!-- Button trigger modal --><!--
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+   --><!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> --><!--
+   -->
+  
+  <!-- <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div> -->
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <!--
+<footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer> -->
+
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
