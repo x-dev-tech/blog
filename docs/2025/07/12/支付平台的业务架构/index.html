@@ -17,19 +17,21 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>归档: 2025/7 | Jason Liu&#39;s Blog</title>
-  <meta name="description" content="我是一名软件工程师，从事互联网工作多年">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Jason Liu&#39;s Blog">
-<meta property="og:url" content="https://blog.xdever.tech/archives/2025/07/index.html">
+  <title>支付平台的业务架构 | Jason Liu&#39;s Blog</title>
+  <meta name="description" content="支付平台的业务架构是支撑其安全、高效、合规运行的核心框架，涵盖从用户交互到资金清算的全流程。以下从产品层、核心业务层、支撑层三个主要维度展开，帮助理解其整体架构： 一、支付平台业务的业务架构 业务架构 产品层 收银台产品 钱包APP 收银台SDK 二维码（扫码支付） WAP&#x2F;Web支付 H5支付 支付网关API   其他产品 小额信贷，例如：支付宝的花呗、借呗 日常支付（代收、代付），例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="支付平台的业务架构">
+<meta property="og:url" content="https://blog.xdever.tech/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/index.html">
 <meta property="og:site_name" content="Jason Liu&#39;s Blog">
-<meta property="og:description" content="我是一名软件工程师，从事互联网工作多年">
+<meta property="og:description" content="支付平台的业务架构是支撑其安全、高效、合规运行的核心框架，涵盖从用户交互到资金清算的全流程。以下从产品层、核心业务层、支撑层三个主要维度展开，帮助理解其整体架构： 一、支付平台业务的业务架构 业务架构 产品层 收银台产品 钱包APP 收银台SDK 二维码（扫码支付） WAP&#x2F;Web支付 H5支付 支付网关API   其他产品 小额信贷，例如：支付宝的花呗、借呗 日常支付（代收、代付），例">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-07-12T15:11:54.000Z">
+<meta property="article:modified_time" content="2025-07-12T15:11:54.171Z">
 <meta property="article:author" content="Jason Liu">
 <meta property="article:tag" content="支付，交易，支付系统，支付平台，电子钱包，第三方支付">
 <meta name="twitter:card" content="summary">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://blog.xdever.tech/archives/2025/07/index.html">
+  <link rel="canonical" href="https://blog.xdever.tech/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Jason Liu&#39;s Blog" type="application/atom+xml">
   
@@ -292,138 +294,247 @@
   
   
 <main class="main" role="main">
-  	<article class="content article article-archives article-type-list" itemscope="">
-	    <header class="article-header">
-	      <h1 itemprop="title">归档: 2025/7</h1>
-	      <p class="text-muted">共 26 篇文章</p>
-	    </header>
-	    <div class="article-body">
-	      
+  <div class="content">
+  <article id="post-支付平台的业务架构" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
   
+    <h1 class="article-title" itemprop="name">
+      支付平台的业务架构
+    </h1>
   
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/" class="article-date">
+	  <time datetime="2025-07-12T15:11:54.000Z" itemprop="datePublished">2025-07-12</time>
+	</a>
+</span>
+        
+        
+
+        
+
+<!--         <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/#comments" class="article-comment-link">评论</a></span> -->
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 513(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 1(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>支付平台的业务架构是支撑其安全、高效、合规运行的核心框架，涵盖从用户交互到资金清算的全流程。以下从产品层、核心业务层、支撑层三个主要维度展开，帮助理解其整体架构：</p>
+<h3 id="一、支付平台业务的业务架构"><a href="#一、支付平台业务的业务架构" class="headerlink" title="一、支付平台业务的业务架构"></a>一、支付平台业务的业务架构</h3><ul>
+<li><strong>业务架构</strong><ul>
+<li><strong>产品层</strong><ul>
+<li>收银台产品<ul>
+<li>钱包APP</li>
+<li>收银台SDK</li>
+<li>二维码（扫码支付）</li>
+<li>WAP&#x2F;Web支付</li>
+<li>H5支付</li>
+<li>支付网关API</li>
+</ul>
+</li>
+<li>其他产品<ul>
+<li>小额信贷，例如：支付宝的花呗、借呗</li>
+<li>日常支付（代收、代付），例如：支付宝、微信中的水电费代收和ETC自动充值</li>
+<li>基金理财产品，例如：支付宝的金额宝</li>
+<li>保险产品，例如：支付宝的互相宝</li>
+</ul>
+</li>
+<li>商户产品<ul>
+<li>运营管理</li>
+<li>资金结算</li>
+<li>开放平台</li>
+<li>产品营销推广</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>核心业务层</strong><ul>
+<li>用户账户体系</li>
+<li>支付核心体系</li>
+<li>运营管理体系</li>
+<li>安全风控体系</li>
+<li>交易渠道管理</li>
+</ul>
+</li>
+<li><strong>支撑层</strong><ul>
+<li>数据支撑<ul>
+<li>数据资产</li>
+<li>实时计算</li>
+<li>离线计算</li>
+<li>机器学习</li>
+<li>人工智能</li>
+<li>数据库</li>
+<li>其他数据工具</li>
+</ul>
+</li>
+<li>技术支撑<ul>
+<li>大数据技术</li>
+<li>安全技术</li>
+<li>移动终端技术</li>
+<li>微服务技术</li>
+<li>监控服务技术</li>
+<li>中间件技术</li>
+<li>数据挖掘技术（商业智能）</li>
+<li>消息通信技术</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>其他</strong><ul>
+<li>金融用户入口<ul>
+<li>央行（商业银行）</li>
+<li>金融小贷公司（信贷实体、征信中心等）</li>
+<li>保险公司（互联网保险）</li>
+<li>其他融资机构（基金公司）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>支付平台的业务架构需平衡高效性（高并发处理）、安全性（风控与合规）、扩展性（对接多通道、支持新业务），核心是通过模块化设计实现 “用户交互→支付处理→资金清算” 的全链路闭环，同时依赖技术支撑和合规体系保障稳定运行。随着数字人民币、跨境支付需求增长，架构还需不断适配新技术与监管要求。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <!-- <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://blog.xdever.tech/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/" title="支付平台的业务架构" target="_blank" rel="external">https://blog.xdever.tech/2025/07/12/支付平台的业务架构/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+-->
+<!--
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="" target="_blank"><span class="text-dark">Jason Liu&#39;s Blog</span><small class="ml-1x">I am a software engineer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+ -->
+
+    </div>
+  </article>
+  
+    <!--
+
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+ -->
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
     
     
-      
-      
-      <section class="panel panel-default b-no">
-        <div class="panel-heading" role="tab">
-          <h3 class="panel-title">
-            <a data-toggle="collapse" href="#collapse2025" aria-expanded="true">
-              <i class="icon icon-calendar-plus text-active"></i><i class="icon icon-calendar-minus text"></i>
-              2025
-            </a>
-            <!-- <a href="/archives/2025" class="archive-year">2025</a> -->
-          </h3>
+    <li class="next">
+      <a href="/article/website-integrate-with-alipay.html" title="企业网站如何接入支付宝开放平台"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
+  
+  <!-- 
+   --><!-- Button trigger modal --><!--
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+   --><!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> --><!--
+   -->
+  
+  <!-- <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div> -->
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div id="collapse2025" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading2025">
-        <div class="panel-body">
-          <div class="collection">
-    
-    
-<a href="/2025/07/12/%E6%94%AF%E4%BB%98%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-12T15:11:54.000Z" itemprop="datePublished">2025-07-12</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付平台的业务架构
-</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-  
-    
-    
-    
-<a href="/article/website-integrate-with-alipay.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-11T16:34:21.000Z" itemprop="datePublished">2025-07-12</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 企业网站如何接入支付宝开放平台
-</a>
 
-
-  
-    
-    
-    
-<a href="/article/payment-system-split.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-10T15:21:49.000Z" itemprop="datePublished">2025-07-10</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付系统中微服务的拆分标准
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/encryption-private-public-key.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-10T15:13:19.000Z" itemprop="datePublished">2025-07-10</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 非对称加密体系（二）-私钥加密/公钥解密
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/encryption-public-private-key.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-10T15:13:09.000Z" itemprop="datePublished">2025-07-10</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 非对称加密体系（一）-公钥加密/私钥解密
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/api-digital-signature.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-10T14:50:22.000Z" itemprop="datePublished">2025-07-10</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付API的数字签名
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/rsa.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-09T16:43:23.000Z" itemprop="datePublished">2025-07-10</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 常用加解密算法 - RSA
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/zhi-fu-zhuang-tai-ji.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-08T15:46:32.000Z" itemprop="datePublished">2025-07-08</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 支付系统中状态机的实现步骤
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/api-idempotency.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-07T16:03:57.000Z" itemprop="datePublished">2025-07-08</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> API幂等性相关实现方式
-</a>
-
-
-  
-    
-    
-    
-<a href="/article/wei-xin-zhi-fu-yu-cai-fu-tong.html" class="collection-item"   itemprop="url">
-  <time datetime="2025-07-07T15:27:28.000Z" itemprop="datePublished">2025-07-07</time>
-  <span>&nbsp;&nbsp;&nbsp;</span> 微信支付与财富通的关系
-</a>
-
-
-  
-  
-    </div></div></div></section>
-  
-
-	    </div>
-  	</article>
-  	 	
 </main>
 
   <!--
@@ -471,6 +582,37 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 
 
 
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
 
 
 
